@@ -5,7 +5,7 @@
   "main": "lib/main.js",
   "scripts": {
     "dev:build": "tsc --watch -p .",
-    "dev:serve": "node lib/main.js"
+    "dev:serve": "node lib/src/main.js"
   },
   "engines": {
     "npm": ">=7.0.0",
