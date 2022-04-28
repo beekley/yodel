@@ -1,9 +1,10 @@
 "use strict";
 
+import { Request } from "@hapi/hapi";
 import { SpotifyWebApi } from "spotify-web-api-ts";
-import { Playlist, Track } from "spotify-web-api-ts/types/types/SpotifyObjects";
+import { Artist, Playlist, Track } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
-export interface TrackOption {
+interface TrackOption {
     id: String;
     name: String;
     artists: String[];
@@ -11,13 +12,32 @@ export interface TrackOption {
     year: Number;
 }
 
-export interface Round {
+interface Round {
     previewUrl: String;
     answerId: String;
     trackOptions: TrackOption[];
 }
 
-export async function getTracksForUser(
+// Wrap route handler with spotify client in a closure.
+export function playFactory(spotify: SpotifyWebApi) {
+    return async function play(request: Request): Promise<Round> {
+        const userId: string = request.params.userId;
+        console.log("Processing request", userId);
+
+        const userTracks: Track[] = await getTracksForUser(spotify, "129048914");
+        const trackOptions: TrackOption[] = await getTrackOptions(spotify, userTracks);
+        const answer: Track = pickTrack(userTracks);
+        const round: Round = {
+            answerId: answer.id,
+            previewUrl: answer.preview_url || "no preview URL found",
+            trackOptions,
+        }
+
+        return round;
+    }
+}
+
+async function getTracksForUser(
     spotify: SpotifyWebApi,
     userId: string
 ): Promise<Track[]> {
@@ -41,12 +61,26 @@ export async function getTracksForUser(
     return tracks;
 }
 
-export async function getTrackOptions(
+async function getTrackOptions(
     spotify: SpotifyWebApi,
     tracks: Track[]
 ): Promise<TrackOption[]> {
     return await Promise.all(
         tracks.map(async function (track: Track): Promise<TrackOption> {
+            // Aggregate all genres across each artist for the track.
+            const genres: String[] = []
+            // TODO: fix this with respect to rate limiting.
+            // await Promise.all(track.artists.map(async function (artist): Promise<Artist> {
+            //     try {
+            //         const details: Artist = await spotify.artists.getArtists(artist.id);
+            //         genres.push(...details.genres);
+            //         return details;
+            //     }
+            //     catch(e) {
+            //         console.log(e);
+            //         return await spotify.artists.getArtist(artist.id);
+            //     }
+            // }));
             const trackOption: TrackOption = {
                 id: track.id,
                 name: track.name,
@@ -54,14 +88,14 @@ export async function getTrackOptions(
                 artists: track.artists.map(function (artist): String {
                     return artist.name;
                 }),
-                genres: [],
+                genres,
             };
             return trackOption;
         })
     );
 }
 
-export function pickTrack(tracks: Track[]): Track {
+function pickTrack(tracks: Track[]): Track {
     const track: Track = tracks[Math.floor(Math.random() * tracks.length)];
     return track;
 }
