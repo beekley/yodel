@@ -4,7 +4,7 @@ import Hapi, { Request } from "@hapi/hapi";
 import { Server } from "@hapi/hapi";
 import { SpotifyWebApi } from "spotify-web-api-ts";
 import { Playlist, Track } from "spotify-web-api-ts/types/types/SpotifyObjects";
-import { getTracksForUser, pickTrack } from "./game";
+import { getTrackOptions, getTracksForUser, pickTrack, Round, TrackOption } from "./game";
 import secrets from "../secrets";
 
 export let server: Server;
@@ -37,14 +37,20 @@ export const start = async function (): Promise<void> {
     return server.start();
 };
 
-async function play(request: Request): Promise<string> {
+async function play(request: Request): Promise<Round> {
     const userId: string = request.params.userId;
     console.log("Processing request", userId);
 
     const userTracks: Track[] = await getTracksForUser(spotify, "129048914");
+    const trackOptions: TrackOption[] = await getTrackOptions(spotify, userTracks);
     const answer: Track = pickTrack(userTracks);
+    const round: Round = {
+        answerId: answer.id,
+        previewUrl: answer.preview_url || "no preview URL found",
+        trackOptions,
+    }
 
-    return answer.preview_url || "no preview url";
+    return round;
 }
 
 process.on("unhandledRejection", (err) => {

@@ -3,6 +3,20 @@
 import { SpotifyWebApi } from "spotify-web-api-ts";
 import { Playlist, Track } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
+export interface TrackOption {
+    id: String;
+    name: String;
+    artists: String[];
+    genres: String[];
+    year: Number;
+}
+
+export interface Round {
+    previewUrl: String;
+    answerId: String;
+    trackOptions: TrackOption[];
+}
+
 export async function getTracksForUser(
     spotify: SpotifyWebApi,
     userId: string
@@ -24,9 +38,27 @@ export async function getTracksForUser(
         });
     });
 
-    console.log(await spotify.artists.getArtist(tracks[100].artists[0].id))
-
     return tracks;
+}
+
+export async function getTrackOptions(
+    spotify: SpotifyWebApi,
+    tracks: Track[]
+): Promise<TrackOption[]> {
+    return await Promise.all(
+        tracks.map(async function (track: Track): Promise<TrackOption> {
+            const trackOption: TrackOption = {
+                id: track.id,
+                name: track.name,
+                year: new Date(track.album.release_date).getFullYear(),
+                artists: track.artists.map(function (artist): String {
+                    return artist.name;
+                }),
+                genres: [],
+            };
+            return trackOption;
+        })
+    );
 }
 
 export function pickTrack(tracks: Track[]): Track {
