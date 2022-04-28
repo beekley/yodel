@@ -19,7 +19,7 @@ interface Round {
 }
 
 // Wrap route handler with spotify client in a closure.
-export function playFactory(spotify: SpotifyWebApi) {
+export function playFactory(spotify: SpotifyWebApi): (request: Request) => Promise<Round> {
     return async function play(request: Request): Promise<Round> {
         const userId: string = request.params.userId;
         console.log("Processing request", userId);

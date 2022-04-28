@@ -28,6 +28,15 @@ export const init = async function (): Promise<Server> {
         handler: playFactory(spotify),
     });
 
+    await server.register(require('@hapi/inert'));
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, h) {
+            return h.file('src/index.html');
+        }
+    });
+
     return server;
 };
 
