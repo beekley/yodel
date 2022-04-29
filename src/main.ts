@@ -33,7 +33,16 @@ export const init = async function (): Promise<Server> {
         method: 'GET',
         path: '/',
         handler: function (request, h) {
-            return h.file('src/index.html');
+            return h.file('./dist/index.html');
+        }
+    });
+    server.route({
+        method: 'GET',
+        path: '/{param*}',
+        handler: {
+            directory: {
+                path: './dist'
+            }
         }
     });
 
