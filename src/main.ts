@@ -4,7 +4,7 @@ import Hapi, { Request } from "@hapi/hapi";
 import { Server } from "@hapi/hapi";
 import { SpotifyWebApi } from "spotify-web-api-ts";
 import { Playlist, Track } from "spotify-web-api-ts/types/types/SpotifyObjects";
-import { playFactory } from "./game";
+import { getGenresFactory, playFactory } from "./game";
 import secrets from "../secrets";
 
 export let server: Server;
@@ -26,6 +26,11 @@ export const init = async function (): Promise<Server> {
         method: "GET",
         path: "/userId/{userId}",
         handler: playFactory(spotify),
+    });
+    server.route({
+        method: "GET",
+        path: "/genres/{artistIds}",
+        handler: getGenresFactory(spotify),
     });
 
     await server.register(require('@hapi/inert'));
