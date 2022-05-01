@@ -78,23 +78,21 @@ export function getGenresFactory(
 ): (request: Request) => Promise<String[]> {
     return async function (request: Request): Promise<String[]> {
         // Treat this as one string since that's what the Spotify API needs.
-        const artistIds: string = request.params.artistIds;
+        const artistIds: string[] = request.params.artistIds.split(",");
         console.log("Getting genres for artistIds:", artistIds);
 
         // Aggregate all genres across each artist for the track.
         const genres: String[] = [];
-        // TODO: fix this with respect to rate limiting.
-        // await Promise.all(track.artists.map(async function (artist): Promise<Artist> {
-        //     try {
-        //         const details: Artist = await spotify.artists.getArtists(artist.id);
-        //         genres.push(...details.genres);
-        //         return details;
-        //     }
-        //     catch(e) {
-        //         console.log(e);
-        //         return await spotify.artists.getArtist(artist.id);
-        //     }
-        // }));
+        try {
+            const details: Artist[] = await spotify.artists.getArtists(artistIds);
+            details.forEach((artist: Artist) => {
+                genres.push(...artist.genres);
+            });
+        }
+        catch(e) {
+            console.log("Failed to get genres for artists ", artistIds, ":", e);
+            // return await spotify.artists.getArtist(artist.id);
+        }
         return genres;
     };
 }
