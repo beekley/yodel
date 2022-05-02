@@ -7,9 +7,9 @@
       // "strict": true,
       // "jsx": "preserve",
       // "moduleResolution": "node",
-      // "experimentalDecorators": true,
+      "experimentalDecorators": true,
       // "skipLibCheck": true,
-      // "esModuleInterop": true,
+      "esModuleInterop": true,
       // "allowSyntheticDefaultImports": true,
       // "forceConsistentCasingInFileNames": true,
       // "useDefineForClassFields": true,
@@ -30,6 +30,12 @@
       //   "scripthost"
       // ]
     },
-    "include": ["src"],
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.vue",
+      "tests/**/*.ts",
+      "tests/**/*.tsx"
+    ],
     "exclude": ["node_modules"]
 }

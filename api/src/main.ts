@@ -36,19 +36,13 @@ export const init = async function (): Promise<Server> {
     await server.register(require('@hapi/inert'));
     server.route({
         method: 'GET',
-        path: '/',
-        handler: function (request, h) {
-            return h.file('./dist/index.html');
-        }
-    });
-    server.route({
-        method: 'GET',
         path: '/{param*}',
         handler: {
             directory: {
-                path: './dist'
-            }
-        }
+                path: '../client/dist',
+                index: ['index.html'],
+            },
+        },
     });
 
     return server;

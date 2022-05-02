@@ -8,23 +8,23 @@ import {
     Track,
 } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
-interface ArtistInfo {
-    id: String;
-    name: String;
+export interface ArtistInfo {
+    id: string;
+    name: string;
     // Null if genres aren't fetched yet.
-    genres?: String[];
+    genres?: string[];
 }
 
-interface TrackInfo {
-    id: String;
-    name: String;
+export interface TrackInfo {
+    id: string;
+    name: string;
     artists: ArtistInfo[];
     year: Number;
 }
 
 // interface Round {
-//     previewUrl: String;
-//     answerId: String;
+//     previewUrl: string;
+//     answerId: string;
 //     TrackInfos: TrackInfo[];
 // }
 
@@ -75,14 +75,14 @@ export function playFactory(
 
 export function getGenresFactory(
     spotify: SpotifyWebApi
-): (request: Request) => Promise<String[]> {
-    return async function (request: Request): Promise<String[]> {
+): (request: Request) => Promise<string[]> {
+    return async function (request: Request): Promise<string[]> {
         // Treat this as one string since that's what the Spotify API needs.
         const artistIds: string[] = request.params.artistIds.split(",");
         console.log("Getting genres for artistIds:", artistIds);
 
         // Aggregate all genres across each artist for the track.
-        const genres: String[] = [];
+        const genres: string[] = [];
         try {
             const details: Artist[] = await spotify.artists.getArtists(artistIds);
             details.forEach((artist: Artist) => {
