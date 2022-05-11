@@ -3,7 +3,7 @@
         <input v-model="search" @input="onChange" type="text" />
         <ul v-show="isOpen" class="autocomplete-results">
             <li
-                v-for="(result, i) in items"
+                v-for="(result, i) in results"
                 v-bind="key"
                 :key="i"
                 @click="setResult(result)"
@@ -39,7 +39,7 @@ export default {
         document.removeEventListener("click", this.handleClickOutside);
     },
     methods: {
-        filterResults() {
+        async filterResults() {
             this.results = this.items.filter(
                 (item) =>
                     item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
