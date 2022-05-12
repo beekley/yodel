@@ -25,6 +25,12 @@ export default {
             default: () => [],
         },
     },
+    // emits: {
+    //     searchId: {
+    //         type: string,
+    //     },
+    // },
+    emits: ["searchId"],
     data() {
         return {
             search: "",
@@ -48,6 +54,8 @@ export default {
         setResult(result) {
             this.search = result;
             this.isOpen = false;
+            // Only emit when an answer is selected from a list.
+            this.$emit("searchId", this.search);
         },
         onChange() {
             this.filterResults();
@@ -63,29 +71,29 @@ export default {
 </script>
 
 <style>
-  .autocomplete {
+.autocomplete {
     position: relative;
-  }
+}
 
-  .autocomplete-results {
+.autocomplete-results {
     padding: 0;
     margin: 0;
     border: 1px solid #eeeeee;
     height: 120px;
     min-height: 1em;
-    max-height: 6em;    
+    max-height: 6em;
     overflow: auto;
-  }
+}
 
-  .autocomplete-result {
+.autocomplete-result {
     list-style: none;
     text-align: left;
     padding: 4px 2px;
     cursor: pointer;
-  }
+}
 
-  .autocomplete-result:hover {
-    background-color: #4AAE9B;
+.autocomplete-result:hover {
+    background-color: #4aae9b;
     color: white;
-  }
+}
 </style>
