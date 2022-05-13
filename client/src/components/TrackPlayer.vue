@@ -4,6 +4,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+enum State {
+    Playing,
+    Stopped,
+}
 
 export default defineComponent({
     props: {
@@ -12,12 +16,20 @@ export default defineComponent({
             required: true,
         }
     },
+    data() {
+        const state: State = State.Playing;
+        return {
+            state,
+            preview: new Audio(this.$props.previewUrl), 
+        }
+    },
     methods: {
         play() {
-            // TODO: preview multiple plays.
             console.log('playing:', this.$props.previewUrl);
-            const preview = new Audio(this.$props.previewUrl);
-            preview.play();
+            this.preview.pause();
+            // Not sure why, but I had to add this to make it play.
+            this.preview = new Audio(this.$props.previewUrl);
+            this.preview.play();
         },
     },
 })
