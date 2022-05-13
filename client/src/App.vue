@@ -2,6 +2,7 @@
     <div id="app">
         <button @click="getTracks">get tracks</button>
         <SearchAutocomplete :items="Array.from(tracks.keys())" @search-id="onSearchChange" />
+        <TrackPlayer :previewUrl="previewUrl" />
     </div>
 </template>
 
@@ -9,15 +10,18 @@
 import axios from "axios";
 import { defineComponent, onMounted } from "vue";
 import SearchAutocomplete from "./components/SearchAutocomplete.vue";
+import TrackPlayer from "./components/TrackPlayer.vue";
 import type { TrackInfo } from "./../../api/src/types";
 export default defineComponent({
   name: "App",
   components: {
     SearchAutocomplete,
+    TrackPlayer,
   },
   data() {
     return {
       tracks: new Map<string, TrackInfo>(),
+      previewUrl: "",
     };
   },
   methods: {
@@ -29,10 +33,10 @@ export default defineComponent({
         }`;
         this.tracks.set(compositeId, t);
       });
-      console.log(this.tracks.keys());
     },
     onSearchChange(searchId: string) {
       console.log('onSearchChange', searchId);
+      this.previewUrl = this.tracks.get(searchId)?.previewUrl || "";
     },
   },
 });

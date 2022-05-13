@@ -54,6 +54,7 @@ export function playFactory(
                     return {
                         id: track.id,
                         name: track.name,
+                        previewUrl: track.preview_url || "",
                         year: new Date(track.album.release_date).getFullYear(),
                         artists: track.artists.map(function (artist): ArtistInfo {
                             return {
