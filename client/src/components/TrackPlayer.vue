@@ -1,5 +1,8 @@
 <template>
-    <button @click="play">play</button>
+    <div>
+        <button v-if="state == 1" @click="play">play</button>
+        <button v-else @click="stop">stop</button>
+    </div>
 </template>
 
 <script lang="ts">
@@ -17,19 +20,23 @@ export default defineComponent({
         },
     },
     data() {
-        const state: State = State.Playing;
         return {
-            state,
+            state: State.Stopped,
             preview: new Audio(this.$props.previewUrl),
         };
     },
     methods: {
         play() {
             console.log("playing:", this.$props.previewUrl);
-            this.preview.pause();
+            this.state = State.Playing;
             // Not sure why, but I had to add this to make it play.
             this.preview = new Audio(this.$props.previewUrl);
             this.preview.play();
+        },
+        stop() {
+            console.log("stopping:", this.$props.previewUrl);
+            this.state = State.Stopped;
+            this.preview.pause();
         },
     },
 });
