@@ -1,5 +1,5 @@
 <template>
-    <div class="autocomplete">
+    <div class="autocompleteContainer">
         <input v-model="search" @input="onChange" type="text" />
         <ul v-show="isOpen" class="autocomplete-results">
             <li
@@ -47,8 +47,7 @@ export default {
     methods: {
         async filterResults() {
             this.results = this.items.filter(
-                (item) =>
-                    item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
+                (item) => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
             );
         },
         setResult(result) {
@@ -71,7 +70,7 @@ export default {
 </script>
 
 <style>
-.autocomplete {
+.autocompleteContainer {
     position: relative;
 }
 

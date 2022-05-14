@@ -1,25 +1,19 @@
 <template>
     <div id="app">
         <button @click="getTracks">get tracks</button>
-        <SearchAutocomplete
-            :items="Array.from(tracks.keys())"
-            @search-id="onSearchChange"
-        />
         <Track
             v-for="id in answerTrackIds"
-            v-bind:id="`track_${tracks.get(id).id}`"
             :key="id"
+            :trackId="id"
             :track="tracks.get(id)"
+            :tracks="Array.from(tracks.keys())"
         />
-        <!-- {{ tracks.get(id).name }}
-        </div> -->
     </div>
 </template>
 
 <script lang="ts">
 import axios from "axios";
 import { defineComponent, onMounted } from "vue";
-import SearchAutocomplete from "./components/SearchAutocomplete.vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 
@@ -28,7 +22,6 @@ const answerCount = 20;
 export default defineComponent({
     name: "App",
     components: {
-        SearchAutocomplete,
         Track,
     },
     data() {
@@ -75,11 +68,6 @@ export default defineComponent({
                     } else console.log("duplicate answer: ", candidateId);
                 }
             }
-            console.log(this.answerTrackIds);
-        },
-        onSearchChange(searchId: string) {
-            console.log("onSearchChange", searchId, this.tracks.has(searchId));
-            this.previewUrl = this.tracks.get(searchId)?.previewUrl || "";
         },
     },
 });

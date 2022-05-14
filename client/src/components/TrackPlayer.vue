@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="trackPlayerContainer">
         <button v-if="state == 1" @click="play">play</button>
         <button v-else @click="stop">stop</button>
     </div>
