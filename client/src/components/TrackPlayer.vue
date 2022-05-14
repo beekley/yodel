@@ -1,5 +1,5 @@
 <template>
-    <button @click=play>play</button>
+    <button @click="play">play</button>
 </template>
 
 <script lang="ts">
@@ -13,24 +13,24 @@ export default defineComponent({
     props: {
         previewUrl: {
             type: String,
-            required: true,
-        }
+            // required: true,
+        },
     },
     data() {
         const state: State = State.Playing;
         return {
             state,
-            preview: new Audio(this.$props.previewUrl), 
-        }
+            preview: new Audio(this.$props.previewUrl),
+        };
     },
     methods: {
         play() {
-            console.log('playing:', this.$props.previewUrl);
+            console.log("playing:", this.$props.previewUrl);
             this.preview.pause();
             // Not sure why, but I had to add this to make it play.
             this.preview = new Audio(this.$props.previewUrl);
             this.preview.play();
         },
     },
-})
+});
 </script>
