@@ -4,6 +4,7 @@
         <button v-if="answerTrackIds.length == 0" @click="getTracks">get tracks</button>
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
+            <div>Correct count: {{ correctCount }} / {{ $props.answerCount }}</div>
             <Track
                 v-for="i in currentAnswerIndex + 1"
                 :key="answerTrackIds[i]"
@@ -45,6 +46,7 @@ export default defineComponent({
             previewUrl: "",
             searchId: "",
             guessCount: 0,
+            correctCount: 0,
         };
     },
     methods: {
@@ -85,7 +87,16 @@ export default defineComponent({
             console.log("Incrementing guess count to", this.guessCount);
         },
         onCorrectGuess() {
+            this.correctCount += 1;
             this.currentAnswerIndex += 1;
+            if (
+                this.currentAnswerIndex >= this.$props.answerCount ||
+                this.guessCount >= this.$props.answerCount
+            ) {
+                // TODO: tell the track components to stop playing.
+                console.log("End of game.");
+                return;
+            }
             console.log(
                 "Correct guess. Incrementing song index to",
                 this.currentAnswerIndex

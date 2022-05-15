@@ -13,7 +13,7 @@ enum State {
     Stopped,
 }
 
-const maxPreviewLength = 30; // seconds.
+const maxPreviewLength = 30 + 2; // seconds.
 
 export default defineComponent({
     props: {

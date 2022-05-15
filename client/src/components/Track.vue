@@ -6,7 +6,7 @@
         </div>
         <div class="search" v-if="isActive">
             <SearchAutocomplete :items="tracks" @search-id="onSearchChange" />
-            <button @click="onSubmit">submit</button>
+            <button :disabled="!validSearchId" @click="onSubmit">submit</button>
         </div>
     </div>
 </template>
@@ -38,6 +38,14 @@ export default defineComponent({
             type: String,
         },
     },
+    computed: {
+        remainingTracks() {
+            // TODO: implement. It should only return unguessed tracks.
+        },
+        validSearchId() {
+            return this.tracks.indexOf(this.currentSearchId) > -1;
+        },
+    },
     data() {
         const pastGuesses: string[] = [];
         return {
@@ -48,11 +56,7 @@ export default defineComponent({
     },
     methods: {
         onSearchChange(searchId: string) {
-            // Check for validity.
-            if (this.tracks.indexOf(searchId) < 0) {
-                return;
-            }
-            console.log("Valid guess entered:", searchId);
+            console.log("Guess entered:", searchId);
             this.currentSearchId = searchId;
         },
         onSubmit() {

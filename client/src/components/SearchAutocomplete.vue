@@ -30,7 +30,7 @@ export default {
     //         type: string,
     //     },
     // },
-    emits: ["searchId"],
+    emits: ["searchId", "change"],
     data() {
         return {
             search: "",
@@ -53,12 +53,14 @@ export default {
         setResult(result) {
             this.search = result;
             this.isOpen = false;
-            // Only emit when an answer is selected from a list.
+            // Selecting an answer doesn't trigger "onChange".
             this.$emit("searchId", this.search);
         },
         onChange() {
             this.filterResults();
             this.isOpen = true;
+            // Emit a change so the parent knows.
+            this.$emit("searchId", this.search);
         },
         handleClickOutside(event) {
             if (!this.$el.contains(event.target)) {
