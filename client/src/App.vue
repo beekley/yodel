@@ -5,11 +5,12 @@
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
             <div>Correct count: {{ correctCount }} / {{ $props.answerCount }}</div>
+            <!-- `v-for` is 1-indexed but answerTrackIds is 0-indexed. -->
             <Track
                 v-for="i in currentAnswerIndex + 1"
-                :key="answerTrackIds[i]"
-                :trackId="answerTrackIds[i]"
-                :track="tracks.get(answerTrackIds[i])"
+                :key="answerTrackIds[i - 1]"
+                :trackId="answerTrackIds[i - 1]"
+                :track="tracks.get(answerTrackIds[i - 1])"
                 :tracks="Array.from(tracks.keys())"
                 @correctGuess="onCorrectGuess"
                 @incorrectGuess="onIncorrectGuess"

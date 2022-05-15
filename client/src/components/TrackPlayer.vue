@@ -21,12 +21,23 @@ export default defineComponent({
             type: String,
             // required: true,
         },
+        stop: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             state: State.Stopped,
             preview: new Audio(this.$props.previewUrl),
         };
+    },
+    watch: {
+        stop() {
+            console.log("Being told to stop from parent.");
+            // Calling this.stop doesn't seem to work here...
+            this.preview.pause();
+        },
     },
     methods: {
         play() {
@@ -46,7 +57,7 @@ export default defineComponent({
             }, duration * 1000);
         },
         stop() {
-            console.log("stopping:", this.$props.previewUrl);
+            console.log("stopping:");
             this.state = State.Stopped;
             this.preview.pause();
         },

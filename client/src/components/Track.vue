@@ -1,6 +1,6 @@
 <template>
     <div class="trackContainer">
-        <TrackPlayer :previewUrl="track?.previewUrl" />
+        <TrackPlayer :previewUrl="track?.previewUrl" :stop="!isActive" />
         <div class="guesses">
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
         </div>
@@ -67,8 +67,16 @@ export default defineComponent({
             const correct = this.currentSearchId == this.trackId;
             console.log("... was it was corrrect?", correct);
             this.$emit(correct ? "correctGuess" : "incorrectGuess");
-            if (correct) this.isActive = false;
+            if (correct) {
+                this.isActive = false;
+            }
         },
     },
 });
 </script>
+
+<style scoped>
+.trackContainer {
+    outline: solid;
+}
+</style>
