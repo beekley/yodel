@@ -1,13 +1,19 @@
 <template>
     <div id="app">
-        <button @click="getTracks">get tracks</button>
-        <Track
-            v-for="id in answerTrackIds"
-            :key="id"
-            :trackId="id"
-            :track="tracks.get(id)"
-            :tracks="Array.from(tracks.keys())"
-        />
+        <!-- TODO: make the v-if a computed property -->
+        <button v-if="answerTrackIds.length == 0" @click="getTracks">get tracks</button>
+        <div id="game" v-if="answerTrackIds.length > 0">
+            <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
+            <Track
+                v-for="i in currentAnswerIndex + 1"
+                :key="answerTrackIds[i]"
+                :trackId="answerTrackIds[i]"
+                :track="tracks.get(answerTrackIds[i])"
+                :tracks="Array.from(tracks.keys())"
+                @correctGuess="onCorrectGuess"
+                @incorrectGuess="onIncorrectGuess"
+            />
+        </div>
     </div>
 </template>
 
@@ -17,12 +23,16 @@ import { defineComponent, onMounted } from "vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 
-const answerCount = 20;
-
 export default defineComponent({
     name: "App",
     components: {
         Track,
+    },
+    props: {
+        answerCount: {
+            type: Number,
+            default: 20,
+        },
     },
     data() {
         const answerTrackIds: string[] = [];
@@ -34,6 +44,7 @@ export default defineComponent({
             currentAnswerIndex: 0,
             previewUrl: "",
             searchId: "",
+            guessCount: 0,
         };
     },
     methods: {
@@ -42,7 +53,7 @@ export default defineComponent({
             const data: TrackInfo[] = (await axios.get("/userId/129048914")).data;
 
             // Break if not enough tracks.
-            if (data.length < answerCount) {
+            if (data.length < this.answerCount) {
                 console.log("Not enough tracks for user to play.");
                 return;
             }
@@ -56,7 +67,7 @@ export default defineComponent({
             });
 
             // Add random tracks to the answer list.
-            for (let i = 0; i < answerCount; i += 1) {
+            for (let i = 0; i < this.answerCount; i += 1) {
                 const ids = Array.from(this.tracks.keys());
                 // Don't add duplicates.
                 while (true) {
@@ -68,6 +79,22 @@ export default defineComponent({
                     } else console.log("duplicate answer: ", candidateId);
                 }
             }
+        },
+        onGuess() {
+            this.guessCount += 1;
+            console.log("Incrementing guess count to", this.guessCount);
+        },
+        onCorrectGuess() {
+            this.currentAnswerIndex += 1;
+            console.log(
+                "Correct guess. Incrementing song index to",
+                this.currentAnswerIndex
+            );
+            this.onGuess();
+        },
+        onIncorrectGuess() {
+            console.log("Incorrect guess.");
+            this.onGuess();
         },
     },
 });

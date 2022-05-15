@@ -47,6 +47,7 @@ export default defineComponent({
             console.log("Submitting as guess:", this.currentSearchId);
             const correct = this.currentSearchId == this.trackId;
             console.log("... was it was corrrect?", correct);
+            this.$emit(correct ? "correctGuess" : "incorrectGuess");
         },
     },
 });
