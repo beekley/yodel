@@ -1,6 +1,5 @@
 <template>
     <div class="trackContainer">
-        {{ $props.track?.name }}
         <TrackPlayer :previewUrl="track?.previewUrl" />
         <div class="guesses">
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
@@ -60,11 +59,11 @@ export default defineComponent({
             console.log("Submitting as guess:", this.currentSearchId);
             // Add to guesses.
             this.pastGuesses.push(this.currentSearchId);
-
             // Check if correct.
             const correct = this.currentSearchId == this.trackId;
             console.log("... was it was corrrect?", correct);
             this.$emit(correct ? "correctGuess" : "incorrectGuess");
+            if (correct) this.isActive = false;
         },
     },
 });
