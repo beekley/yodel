@@ -2,8 +2,13 @@
     <div class="trackContainer">
         {{ $props.track?.name }}
         <TrackPlayer :previewUrl="track?.previewUrl" />
-        <SearchAutocomplete :items="tracks" @search-id="onSearchChange" />
-        <button @click="onSubmit">submit</button>
+        <div class="guesses">
+            <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
+        </div>
+        <div class="search" v-if="isActive">
+            <SearchAutocomplete :items="tracks" @search-id="onSearchChange" />
+            <button @click="onSubmit">submit</button>
+        </div>
     </div>
 </template>
 
@@ -35,16 +40,28 @@ export default defineComponent({
         },
     },
     data() {
+        const pastGuesses: string[] = [];
         return {
             currentSearchId: "",
+            isActive: true, // false once the correct guess has been made.
+            pastGuesses,
         };
     },
     methods: {
         onSearchChange(searchId: string) {
+            // Check for validity.
+            if (this.tracks.indexOf(searchId) < 0) {
+                return;
+            }
+            console.log("Valid guess entered:", searchId);
             this.currentSearchId = searchId;
         },
         onSubmit() {
             console.log("Submitting as guess:", this.currentSearchId);
+            // Add to guesses.
+            this.pastGuesses.push(this.currentSearchId);
+
+            // Check if correct.
             const correct = this.currentSearchId == this.trackId;
             console.log("... was it was corrrect?", correct);
             this.$emit(correct ? "correctGuess" : "incorrectGuess");
