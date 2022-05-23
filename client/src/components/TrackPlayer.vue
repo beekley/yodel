@@ -21,10 +21,6 @@ export default defineComponent({
             type: String,
             // required: true,
         },
-        shouldStop: {
-            type: Boolean,
-            default: false,
-        },
     },
     data() {
         return {
@@ -61,6 +57,11 @@ export default defineComponent({
             this.state = State.Stopped;
             this.preview.pause();
         },
+    },
+    // Stop the preview before removing the UI to stop it.
+    beforeUnmount() {
+        console.log("Unmounting component.");
+        this.stop();
     },
 });
 </script>

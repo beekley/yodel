@@ -1,12 +1,13 @@
 <template>
     <div class="trackContainer">
-        <TrackPlayer :previewUrl="track?.previewUrl" :shouldStop="!isActive" />
+        <TrackPlayer :previewUrl="track?.previewUrl" v-if="isActive" />
         <div class="guesses">
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
         </div>
         <div class="search" v-if="isActive">
             <SearchAutocomplete :items="tracks" @search-id="onSearchChange" />
             <button :disabled="!validSearchId" @click="onSubmit">submit</button>
+            <button @click="onSkip">skip</button>
         </div>
     </div>
 </template>
@@ -22,7 +23,7 @@ export default defineComponent({
         TrackPlayer,
         SearchAutocomplete,
     },
-    emits: ["correctGuess", "incorrectGuess"],
+    emits: ["correctGuess", "incorrectGuess", "skip"],
     props: {
         track: {
             // Looks weird, but what we have to do to use an interface as a type here.
@@ -71,12 +72,19 @@ export default defineComponent({
                 this.isActive = false;
             }
         },
+        onSkip() {
+            console.log("Skipping current song:", this.trackId);
+            this.pastGuesses.push(this.trackId || "");
+            this.isActive = false;
+            this.$emit("skip");
+        },
     },
 });
 </script>
 
 <style scoped>
 .trackContainer {
+    /* TODO: color the outline depending on success or failure */
     outline: solid;
 }
 </style>

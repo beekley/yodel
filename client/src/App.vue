@@ -14,6 +14,7 @@
                 :tracks="Array.from(tracks.keys())"
                 @correctGuess="onCorrectGuess"
                 @incorrectGuess="onIncorrectGuess"
+                @skip="onSkip"
             />
         </div>
     </div>
@@ -83,12 +84,7 @@ export default defineComponent({
                 }
             }
         },
-        onGuess() {
-            this.guessCount += 1;
-            console.log("Incrementing guess count to", this.guessCount);
-        },
-        onCorrectGuess() {
-            this.correctCount += 1;
+        nextTrack() {
             this.currentAnswerIndex += 1;
             if (
                 this.currentAnswerIndex >= this.$props.answerCount ||
@@ -97,16 +93,29 @@ export default defineComponent({
                 // TODO: tell the track components to stop playing.
                 console.log("End of game.");
                 return;
+            } else {
+                console.log(
+                    "Correct guess. Incrementing song index to",
+                    this.currentAnswerIndex
+                );
             }
-            console.log(
-                "Correct guess. Incrementing song index to",
-                this.currentAnswerIndex
-            );
+        },
+        onGuess() {
+            this.guessCount += 1;
+            console.log("Incrementing guess count to", this.guessCount);
+        },
+        onCorrectGuess() {
+            this.correctCount += 1;
             this.onGuess();
+            this.nextTrack();
         },
         onIncorrectGuess() {
             console.log("Incorrect guess.");
             this.onGuess();
+        },
+        onSkip() {
+            console.log();
+            this.nextTrack();
         },
     },
 });
