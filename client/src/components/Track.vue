@@ -1,6 +1,6 @@
 <template>
     <div class="trackContainer">
-        <TrackPlayer :previewUrl="track?.previewUrl" :stop="!isActive" />
+        <TrackPlayer :previewUrl="track?.previewUrl" :shouldStop="!isActive" />
         <div class="guesses">
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
         </div>

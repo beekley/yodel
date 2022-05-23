@@ -21,7 +21,7 @@ export default defineComponent({
             type: String,
             // required: true,
         },
-        stop: {
+        shouldStop: {
             type: Boolean,
             default: false,
         },
@@ -57,7 +57,7 @@ export default defineComponent({
             }, duration * 1000);
         },
         stop() {
-            console.log("stopping:");
+            console.log("stopping:", this.previewUrl);
             this.state = State.Stopped;
             this.preview.pause();
         },
