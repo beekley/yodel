@@ -16,6 +16,17 @@
 </template>
 
 <script>
+const simplify = (s) => {
+    return (
+        s
+            .toLowerCase()
+            // Remove punctuation.
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+            // Remove whitespace.
+            .replace(" ", "")
+    );
+};
+
 export default {
     name: "SearchAutocomplete",
     props: {
@@ -47,7 +58,7 @@ export default {
     methods: {
         async filterResults() {
             this.results = this.items.filter(
-                (item) => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
+                (item) => simplify(item).indexOf(simplify(this.search)) > -1
             );
         },
         setResult(result) {
