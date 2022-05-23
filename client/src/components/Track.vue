@@ -18,6 +18,12 @@ import type { TrackInfo } from "../../../api/src/types";
 import SearchAutocomplete from "./SearchAutocomplete.vue";
 import TrackPlayer from "./TrackPlayer.vue";
 
+enum State {
+    Playing,
+    Correct,
+    Skipped,
+}
+
 export default defineComponent({
     components: {
         TrackPlayer,
@@ -43,16 +49,25 @@ export default defineComponent({
         remainingTracks() {
             // TODO: implement. It should only return unguessed tracks.
         },
-        validSearchId() {
+        validSearchId(): boolean {
             return this.tracks.indexOf(this.currentSearchId) > -1;
+        },
+        isActive(): boolean {
+            console.log("Checking state:", this.state);
+            return this.state == State.Playing;
+        },
+        outlineColor(): string {
+            if (this.state == State.Correct) return "green";
+            if (this.state == State.Skipped) return "red";
+            return "black";
         },
     },
     data() {
         const pastGuesses: string[] = [];
         return {
             currentSearchId: "",
-            isActive: true, // false once the correct guess has been made.
             pastGuesses,
+            state: State.Playing,
         };
     },
     methods: {
@@ -69,13 +84,13 @@ export default defineComponent({
             console.log("... was it was corrrect?", correct);
             this.$emit(correct ? "correctGuess" : "incorrectGuess");
             if (correct) {
-                this.isActive = false;
+                this.state = State.Correct;
             }
         },
         onSkip() {
             console.log("Skipping current song:", this.trackId);
             this.pastGuesses.push(this.trackId || "");
-            this.isActive = false;
+            this.state = State.Skipped;
             this.$emit("skip");
         },
     },
@@ -86,5 +101,6 @@ export default defineComponent({
 .trackContainer {
     /* TODO: color the outline depending on success or failure */
     outline: solid;
+    outline-color: v-bind("outlineColor");
 }
 </style>

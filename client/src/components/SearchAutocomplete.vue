@@ -17,14 +17,13 @@
 
 <script>
 const simplify = (s) => {
-    return (
-        s
-            .toLowerCase()
-            // Remove punctuation.
-            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
-            // Remove whitespace.
-            .replace(" ", "")
-    );
+    const simpler = s
+        .toLowerCase()
+        // Remove punctuation.
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        // Remove whitespace.
+        .replace(/\s/g, "");
+    return simpler;
 };
 
 export default {
