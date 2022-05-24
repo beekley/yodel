@@ -99,7 +99,6 @@ export default defineComponent({
 
 <style scoped>
 .trackContainer {
-    /* TODO: color the outline depending on success or failure */
     outline: solid;
     outline-color: v-bind("outlineColor");
 }
