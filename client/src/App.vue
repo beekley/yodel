@@ -14,7 +14,7 @@
                 :key="answerTrackIds[i - 1]"
                 :trackId="answerTrackIds[i - 1]"
                 :track="tracks.get(answerTrackIds[i - 1])"
-                :tracks="Array.from(tracks.keys())"
+                :tracks="tracks"
                 @correctGuess="onCorrectGuess"
                 @incorrectGuess="onIncorrectGuess"
                 @skip="onSkip"

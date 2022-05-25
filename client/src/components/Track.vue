@@ -5,7 +5,7 @@
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
         </div>
         <div class="search" v-if="isActive">
-            <SearchAutocomplete :items="tracks" @search-id="onSearchChange" />
+            <SearchAutocomplete :items="trackList" @search-id="onSearchChange" />
             <button :disabled="!validSearchId" @click="onSubmit">submit</button>
             <button @click="onSkip">skip</button>
         </div>
@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import type { PropType } from "vue";
 import type { TrackInfo } from "../../../api/src/types";
 import SearchAutocomplete from "./SearchAutocomplete.vue";
 import TrackPlayer from "./TrackPlayer.vue";
@@ -22,6 +23,16 @@ enum State {
     Playing,
     Correct,
     Skipped,
+}
+
+enum Closeness {
+    Hit,
+    Near,
+    Miss,
+}
+
+interface Similarity {
+    year: Closeness;
 }
 
 export default defineComponent({
@@ -36,8 +47,8 @@ export default defineComponent({
             type: Object as () => TrackInfo,
         },
         tracks: {
-            type: Array,
-            default: () => [],
+            type: Object as PropType<Map<string, TrackInfo>>,
+            default: () => {},
         },
         trackId: { type: String },
         // not used.
@@ -50,7 +61,7 @@ export default defineComponent({
             // TODO: implement. It should only return unguessed tracks.
         },
         validSearchId(): boolean {
-            return this.tracks.indexOf(this.currentSearchId) > -1;
+            return this.trackList.indexOf(this.currentSearchId) > -1;
         },
         isActive(): boolean {
             console.log("Checking state:", this.state);
@@ -60,6 +71,9 @@ export default defineComponent({
             if (this.state == State.Correct) return "green";
             if (this.state == State.Skipped) return "red";
             return "black";
+        },
+        trackList() {
+            return Array.from(this.tracks.keys());
         },
     },
     data() {
@@ -71,6 +85,21 @@ export default defineComponent({
         };
     },
     methods: {
+        checkCorrectness(): boolean {
+            return this.currentSearchId == this.trackId;
+        },
+        checkSimilarity(): Similarity {
+            // Compare years.
+            const searched = this.tracks.get(this.currentSearchId) || { year: Infinity };
+            const answer = this.track || { year: Infinity };
+            let closeness = Closeness.Miss;
+            // Same year.
+            if (searched.year == answer.year) closeness = Closeness.Hit;
+            // Same decade.
+            if (Math.floor(searched.year / 10) == Math.floor(answer.year / 10))
+                closeness = Closeness.Near;
+            return { year: closeness };
+        },
         onSearchChange(searchId: string) {
             console.log("Guess entered:", searchId);
             this.currentSearchId = searchId;
@@ -80,7 +109,8 @@ export default defineComponent({
             // Add to guesses.
             this.pastGuesses.push(this.currentSearchId);
             // Check if correct.
-            const correct = this.currentSearchId == this.trackId;
+            const correct = this.checkCorrectness();
+            console.log(this.checkSimilarity());
             console.log("... was it was corrrect?", correct);
             this.$emit(correct ? "correctGuess" : "incorrectGuess");
             if (correct) {

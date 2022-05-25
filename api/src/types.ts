@@ -9,6 +9,6 @@ export interface TrackInfo {
     id: string;
     name: string;
     artists: ArtistInfo[];
-    year: Number;
+    year: number;
     previewUrl: string;
 }

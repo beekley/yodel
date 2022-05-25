@@ -35,11 +35,6 @@ export default {
             default: () => [],
         },
     },
-    // emits: {
-    //     searchId: {
-    //         type: string,
-    //     },
-    // },
     emits: ["searchId", "change"],
     data() {
         return {
