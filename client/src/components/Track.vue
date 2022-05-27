@@ -31,8 +31,13 @@ enum Closeness {
     Miss,
 }
 
-interface Similarity {
-    year: Closeness;
+interface Guess {
+    id: string;
+    correct: boolean;
+    year: {
+        closeness: Closeness;
+        value: string;
+    };
 }
 
 export default defineComponent({
@@ -85,20 +90,33 @@ export default defineComponent({
         };
     },
     methods: {
-        checkCorrectness(): boolean {
-            return this.currentSearchId == this.trackId;
-        },
-        checkSimilarity(): Similarity {
-            // Compare years.
-            const searched = this.tracks.get(this.currentSearchId) || { year: Infinity };
+        checkCorrectness(): Guess {
+            const searched = this.tracks.get(this.currentSearchId) || {
+                year: Infinity,
+                id: "",
+            };
             const answer = this.track || { year: Infinity };
-            let closeness = Closeness.Miss;
+            const guess: Guess = {
+                id: searched.id,
+                correct: this.currentSearchId == this.trackId,
+                year: {
+                    closeness: Closeness.Miss,
+                    value: searched.year.toString(),
+                },
+            };
+
+            // Compare years.
             // Same year.
-            if (searched.year == answer.year) closeness = Closeness.Hit;
+            if (searched.year == answer.year) guess.year.closeness = Closeness.Hit;
             // Same decade.
-            if (Math.floor(searched.year / 10) == Math.floor(answer.year / 10))
-                closeness = Closeness.Near;
-            return { year: closeness };
+            const searchedDecade = Math.floor(searched.year / 10) * 10;
+            const answerDecade = Math.floor(answer.year / 10) * 10;
+            if (searchedDecade == answerDecade) {
+                guess.year.closeness = Closeness.Near;
+                guess.year.value = `${searchedDecade.toString()}s`;
+            }
+
+            return guess;
         },
         onSearchChange(searchId: string) {
             console.log("Guess entered:", searchId);
@@ -109,11 +127,10 @@ export default defineComponent({
             // Add to guesses.
             this.pastGuesses.push(this.currentSearchId);
             // Check if correct.
-            const correct = this.checkCorrectness();
-            console.log(this.checkSimilarity());
-            console.log("... was it was corrrect?", correct);
-            this.$emit(correct ? "correctGuess" : "incorrectGuess");
-            if (correct) {
+            const guess = this.checkCorrectness();
+            console.log("... was it was corrrect?", guess);
+            this.$emit(guess.correct ? "correctGuess" : "incorrectGuess");
+            if (guess.correct) {
                 this.state = State.Correct;
             }
         },
