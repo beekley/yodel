@@ -56,7 +56,9 @@ export function playFactory(
                         name: track.name,
                         previewUrl: track.preview_url || "",
                         year: new Date(track.album.release_date).getFullYear(),
-                        artists: track.artists.map(function (artist): ArtistInfo {
+                        artists: track.artists.map(function (
+                            artist
+                        ): ArtistInfo {
                             return {
                                 id: artist.id,
                                 name: artist.name,
@@ -68,8 +70,7 @@ export function playFactory(
 
             cache.set(userId, results);
             return cache.get(userId)!;
-        }
-        catch (error) {
+        } catch (error) {
             console.log(error);
             return [];
         }
@@ -87,12 +88,13 @@ export function getGenresFactory(
         // Aggregate all genres across each artist for the track.
         const genres: string[] = [];
         try {
-            const details: Artist[] = await spotify.artists.getArtists(artistIds);
+            const details: Artist[] = await spotify.artists.getArtists(
+                artistIds
+            );
             details.forEach((artist: Artist) => {
                 genres.push(...artist.genres);
             });
-        }
-        catch(e) {
+        } catch (e) {
             console.log("Failed to get genres for artists ", artistIds, ":", e);
             // return await spotify.artists.getArtist(artist.id);
         }

@@ -1,7 +1,10 @@
 <template>
     <div id="app">
         <!-- TODO: make the v-if a computed property -->
-        <button v-if="answerTrackIds.length == 0" @click="getTracks">get tracks</button>
+        <div v-if="answerTrackIds.length == 0">
+            <input v-model="userId" />
+            <button @click="getTracks">get tracks</button>
+        </div>
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
             <div>Correct count: {{ correctCount }} / {{ $props.answerCount }}</div>
@@ -52,12 +55,13 @@ export default defineComponent({
             searchId: "",
             guessCount: 0,
             correctCount: 0,
+            userId: "129048914",
         };
     },
     methods: {
         async getTracks() {
             // Fetch from backend.
-            const data: TrackInfo[] = (await axios.get("/userId/129048914")).data;
+            const data: TrackInfo[] = (await axios.get(`/userId/${this.userId}`)).data;
 
             // Break if not enough tracks.
             if (data.length < this.answerCount) {
