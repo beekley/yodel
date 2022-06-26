@@ -23,58 +23,64 @@ export function playFactory(
 
     return async function (request: Request): Promise<TrackInfo[]> {
         const userId: string = request.params.userId;
-        console.log("Getting playlists for userId:", userId);
-
-        if (cache.has(userId)) {
-            console.log("Cache hit.");
-            return cache.get(userId)!;
-        }
-
-        try {
-            const { items } = await spotify.playlists.getUserPlaylists(userId);
-            const playlists: Array<Playlist> = await Promise.all(
-                items.map(async function (p): Promise<Playlist> {
-                    console.log("Getting playlist with id:", p.id);
-                    return await spotify.playlists.getPlaylist(p.id);
-                })
-            );
-            // Only gets the first 100 tracks of a playlist.
-            // TODO: get all of them instead.
-            const tracks: Array<Track> = [];
-            playlists.forEach(function (p) {
-                p.tracks.items.forEach((i) => {
-                    if ((i.track as Track).preview_url) {
-                        tracks.push(i.track as Track);
-                    }
-                });
-            });
-
-            const results = await Promise.all(
-                tracks.map(async function (track: Track): Promise<TrackInfo> {
-                    return {
-                        id: track.id,
-                        name: track.name,
-                        previewUrl: track.preview_url || "",
-                        year: new Date(track.album.release_date).getFullYear(),
-                        artists: track.artists.map(function (
-                            artist
-                        ): ArtistInfo {
-                            return {
-                                id: artist.id,
-                                name: artist.name,
-                            };
-                        }),
-                    };
-                })
-            );
-
-            cache.set(userId, results);
-            return cache.get(userId)!;
-        } catch (error) {
-            console.log(error);
-            return [];
-        }
+        return play(spotify, userId, cache);
     };
+}
+
+export async function play(
+    spotify: SpotifyWebApi,
+    userId: string,
+    cache?: Map<string, TrackInfo[]>
+) {
+    console.log("Getting playlists for userId:", userId);
+
+    if (cache?.has(userId)) {
+        console.log("Cache hit.");
+        return cache.get(userId)!;
+    } else console.log("Cache missing or miss.");
+
+    try {
+        const { items } = await spotify.playlists.getUserPlaylists(userId);
+        const playlists: Array<Playlist> = await Promise.all(
+            items.map(async function (p): Promise<Playlist> {
+                console.log("Getting playlist with id:", p.id);
+                return await spotify.playlists.getPlaylist(p.id);
+            })
+        );
+        // Only gets the first 100 tracks of a playlist.
+        // TODO: get all of them instead.
+        const tracks: Array<Track> = [];
+        playlists.forEach(function (p) {
+            p.tracks.items.forEach((i) => {
+                if ((i.track as Track).preview_url) {
+                    tracks.push(i.track as Track);
+                }
+            });
+        });
+
+        const results = await Promise.all(
+            tracks.map(async function (track: Track): Promise<TrackInfo> {
+                return {
+                    id: track.id,
+                    name: track.name,
+                    previewUrl: track.preview_url || "",
+                    year: new Date(track.album.release_date).getFullYear(),
+                    artists: track.artists.map(function (artist): ArtistInfo {
+                        return {
+                            id: artist.id,
+                            name: artist.name,
+                        };
+                    }),
+                };
+            })
+        );
+
+        cache?.set(userId, results);
+        return cache?.get(userId)! ?? results;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
 }
 
 export function getGenresFactory(

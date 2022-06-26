@@ -61,7 +61,9 @@ export default defineComponent({
     methods: {
         async getTracks() {
             // Fetch from backend.
-            const data: TrackInfo[] = (await axios.get(`/userId/${this.userId}`)).data;
+            const data: TrackInfo[] = (
+                await axios.get(`/api/yodel?userId=${this.userId}`)
+            ).data;
 
             // Break if not enough tracks.
             if (data.length < this.answerCount) {
