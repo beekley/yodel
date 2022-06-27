@@ -1,11 +1,13 @@
 <template>
     <div id="app">
-        <!-- TODO: make the v-if a computed property -->
+        <!-- TODO: make the v-if a computed property. -->
         <div v-if="answerTrackIds.length == 0">
             <input v-model="userId" />
-            <button @click="getTracks">get tracks</button>
+            <button @click="getTracks" :disabled="fetchingTracks">Play!</button>
         </div>
+        <!-- TODO: Move game to its own component. -->
         <div id="game" v-if="answerTrackIds.length > 0">
+            <div>Time remaining: {{ timeRemaining }}</div>
             <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
             <div>Correct count: {{ correctCount }} / {{ $props.answerCount }}</div>
             <!-- `v-for` is 1-indexed but answerTrackIds is 0-indexed. -->
@@ -32,6 +34,8 @@ import { defineComponent, onMounted } from "vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 
+const gameDurationSeconds = 120;
+
 export default defineComponent({
     name: "App",
     components: {
@@ -56,10 +60,26 @@ export default defineComponent({
             guessCount: 0,
             correctCount: 0,
             userId: "129048914",
+            fetchingTracks: false,
+            time: 0, // Seconds
+            timer: 0, // Interval
         };
+    },
+    computed: {
+        timeRemaining(): string {
+            const r = gameDurationSeconds - this.time;
+            if (r <= 0) {
+                clearInterval(this.timer);
+                return "0:00";
+            }
+            const m = Math.floor(r / 60);
+            let s = r % 60;
+            return `${m}:${s < 10 ? "0" : ""}${s}`;
+        },
     },
     methods: {
         async getTracks() {
+            this.fetchingTracks = true;
             // Fetch from backend.
             const data: TrackInfo[] = (
                 await axios.get(`/api/yodel?userId=${this.userId}`)
@@ -92,6 +112,15 @@ export default defineComponent({
                     } else console.log("duplicate answer: ", candidateId);
                 }
             }
+            this.fetchingTracks = false;
+
+            // TODO: Make a button for this.
+            this.startGame();
+        },
+        startGame() {
+            this.timer = setInterval(() => {
+                this.time++;
+            }, 1000);
         },
         nextTrack() {
             this.currentAnswerIndex += 1;
