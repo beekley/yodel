@@ -22,7 +22,7 @@ export function playFactory(
     const cache = new Map<string, TrackInfo[]>();
 
     return async function (request: Request): Promise<TrackInfo[]> {
-        const userId: string = request.params.userId;
+        const userId: string = request.query.userId;
         return play(spotify, userId, cache);
     };
 }

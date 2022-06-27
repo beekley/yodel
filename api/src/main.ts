@@ -24,7 +24,7 @@ export const init = async function (): Promise<Server> {
 
     server.route({
         method: "GET",
-        path: "/userId/{userId}",
+        path: "/api/yodel",
         handler: playFactory(spotify),
     });
     server.route({
@@ -33,14 +33,14 @@ export const init = async function (): Promise<Server> {
         handler: getGenresFactory(spotify),
     });
 
-    await server.register(require('@hapi/inert'));
+    await server.register(require("@hapi/inert"));
     server.route({
-        method: 'GET',
-        path: '/{param*}',
+        method: "GET",
+        path: "/{param*}",
         handler: {
             directory: {
-                path: '../client/dist',
-                index: ['index.html'],
+                path: "../client/dist",
+                index: ["index.html"],
             },
         },
     });
