@@ -58,6 +58,11 @@ export default defineComponent({
             this.preview.pause();
         },
     },
+    mounted() {
+        console.log("Mounted track player.");
+        // Start playing automatically.
+        this.play();
+    },
     // Stop the preview before removing the UI to stop it.
     beforeUnmount() {
         console.log("Unmounting component.");

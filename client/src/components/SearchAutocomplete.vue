@@ -1,6 +1,6 @@
 <template>
     <div class="autocompleteContainer">
-        <input v-model="search" @input="onChange" type="text" />
+        <input v-model="search" @input="onChange" type="text" ref="input" />
         <ul v-show="isOpen" class="autocomplete-results">
             <li
                 v-for="(result, i) in results"
@@ -15,6 +15,7 @@
     </div>
 </template>
 
+<!-- TODO: make TS -->
 <script>
 const simplify = (s) => {
     const simpler = s
@@ -44,7 +45,10 @@ export default {
         };
     },
     mounted() {
+        console.log("Mounted search.");
         document.addEventListener("click", this.handleClickOutside);
+        const input = this.$refs.input;
+        input.focus();
     },
     destroyed() {
         document.removeEventListener("click", this.handleClickOutside);
