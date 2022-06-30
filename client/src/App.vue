@@ -33,8 +33,9 @@ import axios from "axios";
 import { defineComponent, onMounted } from "vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
+import globalState, { State } from "./state";
 
-const gameDurationSeconds = 120;
+const gameDurationSeconds = 60;
 
 export default defineComponent({
     name: "App",
@@ -70,6 +71,7 @@ export default defineComponent({
             const r = gameDurationSeconds - this.time;
             if (r <= 0) {
                 clearInterval(this.timer);
+                globalState.state = State.After;
                 return "0:00";
             }
             const m = Math.floor(r / 60);

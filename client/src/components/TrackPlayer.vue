@@ -41,6 +41,7 @@ export default defineComponent({
             this.state = State.Playing;
             // Not sure why, but I had to add this to make it play.
             this.preview = new Audio(this.$props.previewUrl);
+            this.preview.volume = 0.8;
             this.preview.play();
             // Pause once the preview has ended.
             const duration = Math.min(

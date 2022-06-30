@@ -18,11 +18,12 @@ import type { PropType } from "vue";
 import type { TrackInfo } from "../../../api/src/types";
 import SearchAutocomplete from "./SearchAutocomplete.vue";
 import TrackPlayer from "./TrackPlayer.vue";
+import * as globalState from "../state";
 
 enum State {
     Playing,
     Correct,
-    Skipped,
+    Incorrect,
 }
 
 enum Closeness {
@@ -69,12 +70,15 @@ export default defineComponent({
             return this.trackList.indexOf(this.currentSearchId) > -1;
         },
         isActive(): boolean {
-            console.log("Checking state:", this.state);
+            // When the game ends, "skip" the current track so it shows the answer.
+            if (globalState.default.state == globalState.State.After) {
+                this.state = State.Incorrect;
+            }
             return this.state == State.Playing;
         },
         outlineColor(): string {
             if (this.state == State.Correct) return "green";
-            if (this.state == State.Skipped) return "red";
+            if (this.state == State.Incorrect) return "red";
             return "black";
         },
         trackList() {
@@ -87,7 +91,20 @@ export default defineComponent({
             currentSearchId: "",
             pastGuesses,
             state: State.Playing,
+            globalState,
         };
+    },
+    watch: {
+        state() {
+            console.log(
+                `Local state change: ${State[this.state]}; global: ${
+                    globalState.default.state
+                }`
+            );
+            if (this.state == State.Incorrect) {
+                this.pastGuesses.push(this.trackId || "");
+            }
+        },
     },
     methods: {
         checkCorrectness(): Guess {
@@ -136,9 +153,8 @@ export default defineComponent({
         },
         onSkip() {
             console.log("Skipping current song:", this.trackId);
-            this.pastGuesses.push(this.trackId || "");
-            this.state = State.Skipped;
             this.$emit("skip");
+            this.state = State.Incorrect;
         },
     },
 });
