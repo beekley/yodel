@@ -8,8 +8,9 @@
         <!-- TODO: Move game to its own component. -->
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Time remaining: {{ timeRemaining }}</div>
-            <div>Guess count: {{ guessCount }} / {{ $props.answerCount }}</div>
-            <div>Correct count: {{ correctCount }} / {{ $props.answerCount }}</div>
+            <div>Track count: {{ currentAnswerIndex + 1 }}</div>
+            <div>Guess count: {{ guessCount }}</div>
+            <div>Correct count: {{ correctCount }}</div>
             <!-- `v-for` is 1-indexed but answerTrackIds is 0-indexed. -->
             <Track
                 v-for="i in Math.min(
