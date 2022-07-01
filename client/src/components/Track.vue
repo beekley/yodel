@@ -71,7 +71,10 @@ export default defineComponent({
         },
         isActive(): boolean {
             // When the game ends, "skip" the current track so it shows the answer.
-            if (globalState.default.state == globalState.State.After) {
+            if (
+                globalState.default.state == globalState.State.After &&
+                this.state == State.Playing
+            ) {
                 this.state = State.Incorrect;
             }
             return this.state == State.Playing;

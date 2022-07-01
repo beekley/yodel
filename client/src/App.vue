@@ -1,7 +1,13 @@
 <template>
     <div id="app">
+        <p>Yodel: How well do you know your music.</p>
+        <p>
+            You have {{ $props.gameDurationSeconds }} seconds to guess as many tracks from
+            your library as you can.
+        </p>
         <!-- TODO: make the v-if a computed property. -->
         <div v-if="answerTrackIds.length == 0">
+            <p>Enter Spotify ID to start playing:</p>
             <input v-model="userId" />
             <button @click="getTracks" :disabled="fetchingTracks">Play!</button>
         </div>
@@ -36,8 +42,6 @@ import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 import globalState, { State } from "./state";
 
-const gameDurationSeconds = 60;
-
 export default defineComponent({
     name: "App",
     components: {
@@ -46,7 +50,11 @@ export default defineComponent({
     props: {
         answerCount: {
             type: Number,
-            default: 20,
+            default: 50,
+        },
+        gameDurationSeconds: {
+            type: Number,
+            default: 60,
         },
     },
     data() {
@@ -69,7 +77,7 @@ export default defineComponent({
     },
     computed: {
         timeRemaining(): string {
-            const r = gameDurationSeconds - this.time;
+            const r = this.gameDurationSeconds - this.time;
             if (r <= 0) {
                 clearInterval(this.timer);
                 globalState.state = State.After;
@@ -89,7 +97,7 @@ export default defineComponent({
             ).data;
 
             // Break if not enough tracks.
-            if (data.length < this.answerCount) {
+            if (data.length < this.$props.answerCount) {
                 console.log("Not enough tracks for user to play.");
                 return;
             }
