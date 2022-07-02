@@ -14,9 +14,9 @@
         <!-- TODO: Move game to its own component. -->
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Time remaining: {{ timeRemaining }}</div>
-            <div>Track count: {{ trackCount }}</div>
+            <!-- <div>Track count: {{ trackCount }}</div>
             <div>Guess count: {{ guessCount }}</div>
-            <div>Correct count: {{ correctCount }}</div>
+            <div>Correct count: {{ correctCount }}</div> -->
             <!-- `v-for` is 1-indexed but answerTrackIds is 0-indexed. -->
             <Track
                 v-for="i in Math.min(
@@ -32,6 +32,7 @@
                 @skip="onSkip"
             />
         </div>
+        <Results v-if="state == 2" :gameHistories="gameHistories" />
     </div>
 </template>
 
@@ -42,18 +43,14 @@ import { defineComponent, onMounted } from "vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 import globalState, { State } from "./state";
-
-interface GameHistory {
-    timestamp: number;
-    trackCount: number;
-    guessCount: number;
-    correctCount: number;
-}
+import type { GameHistory } from "./components/Results.vue";
+import Results from "./components/Results.vue";
 
 export default defineComponent({
     name: "App",
     components: {
         Track,
+        Results,
     },
     props: {
         answerCount: {
@@ -97,6 +94,12 @@ export default defineComponent({
         },
         trackCount(): number {
             return this.currentAnswerIndex + 1;
+        },
+        state(): State {
+            return globalState.state;
+        },
+        gameHistories(): GameHistory[] {
+            return JSON.parse(localStorage["gameHistories"] ?? "[]") as GameHistory[];
         },
     },
     methods: {
@@ -153,6 +156,7 @@ export default defineComponent({
             ) as GameHistory[];
             const gameHistory = {
                 timestamp: Math.floor(Date.now() / 1000),
+                gameDurationSeconds: this.gameDurationSeconds,
                 trackCount: this.trackCount,
                 guessCount: this.guessCount,
                 correctCount: this.correctCount,
