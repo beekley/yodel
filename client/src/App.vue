@@ -14,7 +14,7 @@
         <!-- TODO: Move game to its own component. -->
         <div id="game" v-if="answerTrackIds.length > 0">
             <div>Time remaining: {{ timeRemaining }}</div>
-            <div>Track count: {{ currentAnswerIndex + 1 }}</div>
+            <div>Track count: {{ trackCount }}</div>
             <div>Guess count: {{ guessCount }}</div>
             <div>Correct count: {{ correctCount }}</div>
             <!-- `v-for` is 1-indexed but answerTrackIds is 0-indexed. -->
@@ -36,11 +36,19 @@
 </template>
 
 <script lang="ts">
+// TODO: split this up. This file is getting too broad.
 import axios from "axios";
 import { defineComponent, onMounted } from "vue";
 import Track from "./components/Track.vue";
 import type { TrackInfo } from "../../api/src/types";
 import globalState, { State } from "./state";
+
+interface GameHistory {
+    timestamp: number;
+    trackCount: number;
+    guessCount: number;
+    correctCount: number;
+}
 
 export default defineComponent({
     name: "App",
@@ -54,7 +62,7 @@ export default defineComponent({
         },
         gameDurationSeconds: {
             type: Number,
-            default: 60,
+            default: 5,
         },
     },
     data() {
@@ -80,12 +88,15 @@ export default defineComponent({
             const r = this.gameDurationSeconds - this.time;
             if (r <= 0) {
                 clearInterval(this.timer);
-                globalState.state = State.After;
+                this.endGame();
                 return "0:00";
             }
             const m = Math.floor(r / 60);
             let s = r % 60;
             return `${m}:${s < 10 ? "0" : ""}${s}`;
+        },
+        trackCount(): number {
+            return this.currentAnswerIndex + 1;
         },
     },
     methods: {
@@ -132,6 +143,22 @@ export default defineComponent({
             this.timer = setInterval(() => {
                 this.time++;
             }, 1000);
+        },
+        endGame() {
+            console.log("Ending game");
+            globalState.state = State.After;
+            // Store game history.
+            const gameHistories = JSON.parse(
+                localStorage["gameHistories"] ?? "[]"
+            ) as GameHistory[];
+            const gameHistory = {
+                timestamp: Math.floor(Date.now() / 1000),
+                trackCount: this.trackCount,
+                guessCount: this.guessCount,
+                correctCount: this.correctCount,
+            };
+            gameHistories.push(gameHistory);
+            localStorage["gameHistories"] = JSON.stringify(gameHistories);
         },
         nextTrack() {
             this.currentAnswerIndex += 1;
