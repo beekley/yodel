@@ -5,7 +5,11 @@
             <p v-for="id in pastGuesses" :key="id">{{ id }}</p>
         </div>
         <div class="search" v-if="isActive">
-            <SearchAutocomplete :items="trackList" @search-id="onSearchChange" />
+            <SearchAutocomplete
+                :items="trackList"
+                @search-id="onSearchChange"
+                @enter="onSubmit"
+            />
             <button :disabled="!validSearchId" @click="onSubmit">submit</button>
             <button @click="onSkip">skip</button>
         </div>

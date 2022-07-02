@@ -59,7 +59,7 @@ export default defineComponent({
         },
         gameDurationSeconds: {
             type: Number,
-            default: 5,
+            default: 60,
         },
     },
     data() {

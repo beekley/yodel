@@ -1,6 +1,14 @@
 <template>
     <div class="autocompleteContainer">
-        <input v-model="search" @input="onChange" type="text" ref="input" />
+        <input
+            v-model="searchid"
+            @input="onChange"
+            type="text"
+            ref="input"
+            @keydown.down="onArrowDown"
+            @keydown.up="onArrowUp"
+            @keydown.enter="onEnter"
+        />
         <ul v-show="isOpen" class="autocomplete-results">
             <li
                 v-for="(result, i) in results"
@@ -8,6 +16,7 @@
                 :key="i"
                 @click="setResult(result)"
                 class="autocomplete-result"
+                :class="{ 'is-selected': i === selectedIndex }"
             >
                 {{ result }}
             </li>
@@ -36,12 +45,13 @@ export default {
             default: () => [],
         },
     },
-    emits: ["searchId", "change"],
+    emits: ["searchId", "change", "enter"],
     data() {
         return {
-            search: "",
+            searchid: "",
             results: [],
             isOpen: false,
+            selectedIndex: -1, // Index of selected track?
         };
     },
     mounted() {
@@ -56,25 +66,48 @@ export default {
     methods: {
         async filterResults() {
             this.results = this.items.filter(
-                (item) => simplify(item).indexOf(simplify(this.search)) > -1
+                (item) => simplify(item).indexOf(simplify(this.searchid)) > -1
             );
         },
         setResult(result) {
-            this.search = result;
+            console.log("setting result:", this.result);
+            this.searchid = result;
             this.isOpen = false;
             // Selecting an answer doesn't trigger "onChange".
-            this.$emit("searchId", this.search);
+            this.$emit("searchId", this.searchid);
         },
         onChange() {
             this.filterResults();
             this.isOpen = true;
             // Emit a change so the parent knows.
-            this.$emit("searchId", this.search);
+            this.$emit("searchId", this.searchid);
         },
         handleClickOutside(event) {
             if (!this.$el.contains(event.target)) {
                 this.isOpen = false;
             }
+        },
+        onArrowDown() {
+            if (this.selectedIndex < this.results.length) {
+                this.selectedIndex = this.selectedIndex + 1;
+            }
+            console.log("down", this.selectedIndex, this.results[this.selectedIndex]);
+        },
+        onArrowUp() {
+            if (this.selectedIndex > 0) {
+                this.selectedIndex = this.selectedIndex - 1;
+            }
+            console.log("up", this.selectedIndex, this.results[this.selectedIndex]);
+        },
+        onEnter() {
+            if (this.selectedIndex < 0) {
+                console.log("No track selected from list, so bubbling enter event up");
+                this.$emit("enter");
+                return;
+            }
+            this.setResult(this.results[this.selectedIndex]);
+            this.selectedIndex = -1;
+            // this.isOpen = false;
         },
     },
 };
@@ -88,10 +121,10 @@ export default {
 .autocomplete-results {
     padding: 0;
     margin: 0;
-    border: 1px solid #eeeeee;
+    /* border: 1px solid #eeeeee; */
     height: 120px;
-    min-height: 1em;
-    max-height: 6em;
+    /* min-height: 1em;
+    max-height: 6em; */
     overflow: auto;
 }
 
@@ -102,6 +135,7 @@ export default {
     cursor: pointer;
 }
 
+.autocomplete-result.is-selected,
 .autocomplete-result:hover {
     background-color: #4aae9b;
     color: white;
